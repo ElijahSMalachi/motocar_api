@@ -10,24 +10,41 @@ class CarController extends Controller
 {
     public function index()
     {
-        return Car::all(); // List all cars
+        if (isset($_GET['user_id']) && $_GET['user_id'] != '') {
+            $user_id = $_GET['user_id'];
+        }else {
+            return response()->json(['error' => 'please provide the user_id'], 422);
+        }
+        $cars = Car::where('user_id', $user_id)->get();
+        return $cars; 
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'make' => 'required|string',
             'model' => 'required|string',
             'license_plate' => 'required|string|unique:cars',
             'seats' => 'required|integer|min:1',
             'color' => 'nullable|string',
             'year' => 'nullable|integer',
-            'user_id' => 'required|exists:users,id',
         ]);
+        $car = new Car;
+        $car->make = $request->make;
+        $car->model = $request->model;
+        $car->license_plate = $request->license_plate;
+        $car->seats = $request->seats;
+        $car->color = $request->color;
+        $car->year = $request->year;
 
-        return Car::create($validated);
+        return response()->json(['message' => 'Car added successfully']);
     }
 
+    public function show(Request $request, Car $car)
+    {
+        return $car;
+    }
+    
     public function update(Request $request, Car $car)
     {
         $validated = $request->validate([

@@ -17,6 +17,7 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 
 
 Route::apiResource('/cars', CarController::class);
+
 Route::apiResource('/documents', DocumentController::class);
 Route::prefix('/users')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('/', UsersController::class);

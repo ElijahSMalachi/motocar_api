@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pickup_location_id')->constrained('locations')->onDelete('cascade');
             $table->foreignId('destination_location_id')->constrained('locations')->onDelete('cascade');
+            $table->foreignId('car_id')->constrained('cars')->onDelete('cascade');
             $table->foreignId('driver_id')->constrained('users')->onDelete('cascade');
             $table->integer('seats')->default(1);
             $table->integer('available_seats')->default(1);

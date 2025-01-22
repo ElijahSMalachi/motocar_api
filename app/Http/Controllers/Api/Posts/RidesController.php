@@ -38,10 +38,10 @@ class RidesController extends Controller
 
             // Ride Validation
             'seats' => 'required|integer|min:1',
-            'available_seats' => 'required|integer|min:1',
+            'car_id' => 'required|integer',
             'price_per_seat' => 'required|numeric|min:0',
             'start_off_date' => 'required|date_format:Y-m-d H:i|after_or_equal:now',
-            'return_date' => 'nullable|date_format:Y-m-d H:i|after_or_equal:start_off_date',
+            'return_date' => 'nullable|sometimes|date_format:Y-m-d H:i|after_or_equal:start_off_date',
         ]);
 
         if (!empty($request->pickup_location)) {
@@ -72,10 +72,10 @@ class RidesController extends Controller
             $user = Auth::user();
             $ride = new Ride;
             $ride->driver_id = $user->id;
+            $ride->car_id = $request->car_id;
             $ride->pickup_location_id = $pickupLocation->id;
             $ride->destination_location_id = $destinationLocation->id;
             $ride->seats = $request->seats;
-            $ride->available_seats = $request->available_seats;
             $ride->price_per_seat = $request->price_per_seat;
             $ride->start_off_date = $request->start_off_date;
             $ride->return_date = $request->return_date;
