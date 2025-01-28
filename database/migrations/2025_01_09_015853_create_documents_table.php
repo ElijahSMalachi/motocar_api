@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('documentable_type');
-            $table->morphs('documentable_id');
+            $table->morphs('documentable');
             $table->string('type'); 
             $table->string('file_path');
             $table->timestamps();

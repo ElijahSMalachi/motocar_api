@@ -114,3 +114,23 @@ function refundUserTransactionFee($ride, $user)
     ]);
 }
 
+function storeFile($passed_file, $type)
+{
+    // Get the original file name and extension
+    $image = $passed_file->getClientOriginalName();
+    $fileName = pathinfo(str_replace(' ', '_', $image), PATHINFO_FILENAME);
+    $extension = $passed_file->getClientOriginalExtension();
+    
+    // Create a unique file name
+    $fileToStore = $fileName . '_' . time() . '.' . $extension;
+    
+    // Define the path structure
+    $path = $type . '/' . date('Y') . '/' . date('M');
+    
+    // Store the file in the 'public' disk
+    $storedPath = $passed_file->storeAs($path, $fileToStore, 'public');
+    
+    // Return the accessible URL
+    return 'storage/' . $storedPath;
+}
+

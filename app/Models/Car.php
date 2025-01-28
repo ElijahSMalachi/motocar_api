@@ -25,4 +25,5 @@ class Car extends Model
     {
         return $this->morphMany(Document::class, 'documentable');
     }
+    
 }

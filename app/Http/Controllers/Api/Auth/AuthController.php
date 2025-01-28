@@ -23,13 +23,18 @@ class AuthController extends Controller
                 'email' => 'sometimes|email',
                 'password' => 'required|min:6|confirmed',
             ]);
+            $phoneNumber = $request->phone_number;
+            if (!str_starts_with($phoneNumber, '+260')) {
+                $phoneNumber = '+260' . ltrim($phoneNumber, '0'); // Remove leading 0 if it exists
+            }
+    
 
             $user = new User;
             $user->first_name = $request->first_name;
             $user->last_name = $request->last_name;
             $user->gender = $request->gender;
             $user->dob = $request->dob;
-            $user->phone_number = $request->phone_number;
+            $user->phone_number = $phoneNumber;
             $user->email = $request->email;
             $user->password = Hash::make($request->password);
             $user->save();
@@ -45,26 +50,34 @@ class AuthController extends Controller
         } catch (\Throwable $e) {
             // Log the error for debugging purposes
             Log::error('User registration failed', ['error' => $e->getMessage()]);
-            
+
             return response()->json([
                 'msg' => 'An error occurred while creating the user.',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
-    
-    
+
+
     public function login(Request $request)
     {
         $request->validate([
-            'phone_number' => 'required|string|exists:users',
+            'phone_number' => 'required|string',
             'password' => 'required|min:6',
-        ],[
-            'phone_number.exists' => 'The providered phone number is not registered'
         ]);
-        
-        $user = User::where('phone_number', $request->phone_number)->first();
-        
+
+        // Ensure the phone number starts with +260
+        $phoneNumber = $request->phone_number;
+        if (!str_starts_with($phoneNumber, '+260')) {
+            $phoneNumber = '+260' . ltrim($phoneNumber, '0'); // Remove leading 0 if it exists
+        }
+
+        $user = User::where('phone_number', $phoneNumber)->first();
+
+        if (!$user) {
+            abort(401, 'The provided phone number is not registered.');
+        }
+
         if (!$user || !Hash::check($request->password, $user?->password)) {
             abort(401, 'The provided password is incorrect.');
         }
@@ -73,10 +86,10 @@ class AuthController extends Controller
         return response()->json(['user' => $user, 'token' => $token?->plainTextToken]);
     }
 
+
     public function logout(Request $request)
-    {   
+    {
         $request->user()->tokens()->delete();
         return response()->json(['msg' => 'You are logged out.']);
     }
-
 }

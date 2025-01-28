@@ -16,9 +16,11 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
 
-Route::apiResource('/cars', CarController::class);
+Route::apiResource('/cars', CarController::class)->middleware('auth:sanctum');
 
-Route::apiResource('/documents', DocumentController::class);
+Route::post('/car', [CarController::class, 'store'])->middleware('auth:sanctum');
+
+Route::apiResource('/documents', DocumentController::class)->middleware('auth:sanctum');
 Route::prefix('/users')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('/', UsersController::class);
 });

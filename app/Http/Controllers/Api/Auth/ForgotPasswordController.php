@@ -42,14 +42,18 @@ class ForgotPasswordController extends Controller
             'token' => 'required|string',
             'password' => 'required|string|min:6|confirmed',
         ]);
-    
+        $phoneNumber = $request->phone_number;
+        if (!str_starts_with($phoneNumber, '+260')) {
+            $phoneNumber = '+260' . ltrim($phoneNumber, '0'); // Remove leading 0 if it exists
+        }
+
         $isVerified = checkTwilioVerification('+260776584836', $request->token);
 
         if (!$isVerified) {
             return response()->json(['message' => 'Invalid reset code'], 400);
         }
 
-        $user = User::where('phone_number', '+'.$request->phone_number)->first();
+        $user = User::where('phone_number', '+'.$phoneNumber)->first();
         $user->password = Hash::make($request->password);
         $user->save();
         return response()->json(['message' => 'Password reset successfully']);
